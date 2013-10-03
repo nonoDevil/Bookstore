@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %} 图书管理 {% endblock %}
+
+{% block grid_content %}
+<div id="grid_book" class="k-content">
+	<div id="grid"></div>
+	<script>
+		$(document).ready(function(){
+
+			//渲染得到所有作者名单
+			var authorsSource = [{% for author in authorlist %}"{{ author }}",{% endfor %}]
+			//渲染得到所有出版社名单
+			var publisherSource = [{% for publisher in publisherlist %}"{{ publisher }}",{% endfor %}]
+			console.log(authorsSource);
+			console.log(publisherSource);
+			function authorsEditor(container, options) {
+				var site_url = "/";
+			    $("<select multiple='multiple' " + 
+			      "data-bind='value : authors'/>").appendTo(container).kendoMultiSelect({
+					dataSource: authorsSource,
+					maxSelectedItems: 4    //作者最多四个人
+			    });
+			}
+			function publisherEditor(container, options) {
+				var site_url = "/";
+			    $("<select multiple='multiple' " + 
+			      "data-bind='value : publisher'/>").appendTo(container).kendoMultiSelect({
+					dataSource: publisherSource,
+					maxSelectedItems: 1    //出版社最多选一个
+			    });
+			}
+			var crudServiceBaseUrl = "/",
+				dataSource = new kendo.data.DataSource({
+			 		transport: {
+			 			read: {
+			 				url: crudServiceBaseUrl + "read_book/",
+			 				dataType: "json",
+			 				type: "GET"
+			 			},
+			 			update: {
+			 				url: crudServiceBaseUrl + "update_book/",
+			 				dataType: "json",
+			 				type: "POST" 
+			 			},
+			 			destroy: {
+			 				url: crudServiceBaseUrl + "delete_book/",
+			 				dataType: "json",
+			 				type: "POST" 
+			 			},
+			 			create: {
+			 				url: crudServiceBaseUrl + "create_book/",
+			 				dataType: "json",
+			 				type: "POST" 
+			 			},
+			 			parameterMap: function(options, operation) {
+			 				if (operation == "read") {
+			 					return {
+			 						'page': options.page,
+			 						'pageSize': options.pageSize
+			 					}
+			 				}
+			 				if (operation !== 'read' && options.models) {
+			 					return { 
+			 						     "models":kendo.stringify(options.models),
+			 					         "operation": operation 
+			 					       };
+			 				}
+			 			}
+			 		},
+			 		batch: true,
+			 		serverPaging: true,
+			 		pageSize: 10,
+			 		serverFiltering: true,
+			 		schema: {
+			 			model: {
+			 				id: "id",
+			 				fields: {
+			 					title: { type:"string", editable: true, validation:{required: true} },
+			 					authors: { type:"string", editable: true, validation:{required: true} },
+			 					publisher: { type:"string", editable: true, validation:{required: true} },
+			 					publication_date: { type:"date", editable: true,},
+			 					price: { type: "number", validation: { required: true, min: 0} },			 		
+			 				}
+			 			},
+			 			data:function(res){return res.data},
+			 			total:function(res){return res.total},
+			 			//error: function(res){alert(res.message); return res.message}
+			 		},
+			 	});
+			$("#grid").kendoGrid({
+				dataSource: dataSource,   //表格数据
+			 	resizable: true,   //表格大小可变
+			 	pageable: true,    //是否可分页
+			 	sortable: true,    //排序
+			 	height: 600,       //表格高度
+			 	filterable: true,   //可过滤选项
+			 	update:true,        //可否更新
+			 	toolbar: [{name:"create", text:"增加记录"}],     //新增记录按钮设置
+			 	columns: [
+			 		{ 
+			 			field: "title",     //行变量名
+			 			title: "书籍名称",    //列名称
+			 			width: "100px",     //宽度
+			 			headerAttributes: { style: "text-align: center" }, //设置标题居中
+			 			attributes: { style: "text-align: center" },       //设置值居中
+			 		},
+			 		{ 
+			 			field: "authors", 
+			 			title: "作者", 
+			 			width: "100px",
+			 			headerAttributes: { style: "text-align: center" },
+			 			attributes: { style: "text-align: center" },
+			 			editor: authorsEditor,    //编辑的时候所执行的js
+        				template: kendo.template("#= authors #")  //编辑的时候显示的值
+			 		},
+			 		{ 
+			 			field: "publisher", 
+			 			title: "出版社", 
+			 			width: "100px",
+			 			headerAttributes: { style: "text-align: center" },
+			 			attributes: { style: "text-align: center" },
+			 			editor: publisherEditor,    //编辑的时候所执行的js
+        				template: kendo.template("#= publisher #")    //编辑的时候所显示的值
+			 		},
+			 		{ 
+			 			field: "publication_date", 
+			 			title: "出版日期", 
+			 			width: "100px",
+			 			headerAttributes: { style: "text-align: center" },
+			 			attributes: { style: "text-align: center" },
+			 		},
+			 		{ 
+			 			field: "price", 
+			 			title: "价格", 
+			 			width: "100px",
+			 			format: "{0:c}",
+			 			headerAttributes: { style: "text-align: center" },
+			 			attributes: { style: "text-align: center" },
+			 		},
+			 		{ 
+			 			command: [{name:"edit", text:"编辑"}, {name:"destroy", text:"删除"}], //设置最后一列的按钮 
+			 			title: "操作", 
+			 			width: "172px",
+			 			headerAttributes: { style: "text-align: center" },
+			 			attributes: { style: "text-align: center" } 
+			 		},
+			 	],
+			 	editable:{    //设置编辑模式
+			 		mode: "inline",   //在当前行编辑
+			 		confirmation: "您想删除此条记录吗?", //删除时候的确认信息
+			 	},
+			 }).data("kendoGrid");
+		});
+
+	</script>
+</div>
+{% endblock %}

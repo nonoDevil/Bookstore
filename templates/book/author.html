@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %} 作者管理 {% endblock %}
+
+{% block grid_content %}
+<div id="grid_author" class="k-content">
+	<div id="grid"></div>
+	<script>
+		$(document).ready(function(){
+			//得到所有作者名单
+			var names = [{% for author in authorlist %}"{{ author }}",{% endfor %}]
+			console.log(names);
+			function authorsEditor(container, options) {
+				var site_url = "/";
+			    $("<select multiple='multiple' " + 
+			      "data-bind='value : name'/>").appendTo(container).kendoMultiSelect({
+					dataSource: names
+			    });
+			}
+			var crudServiceBaseUrl = "/",
+				dataSource = new kendo.data.DataSource({
+			 		transport: {
+			 			read: {
+			 				url: crudServiceBaseUrl + "read_author/",
+			 				dataType: "json",
+			 				type: "GET"
+			 			},
+			 			update: {
+			 				url: crudServiceBaseUrl + "update_author/",
+			 				dataType: "json",
+			 				type: "POST" 
+			 			},
+			 			destroy: {
+			 				url: crudServiceBaseUrl + "delete_author/",
+			 				dataType: "json",
+			 				type: "POST" 
+			 			},
+			 			create: {
+			 				url: crudServiceBaseUrl + "create_author/",
+			 				dataType: "json",
+			 				type: "POST" 
+			 			},
+			 			parameterMap: function(options, operation) {
+			 				if (operation == "read") {
+			 					return {
+			 						'page': options.page,
+			 						'pageSize': options.pageSize
+			 					}
+			 				}
+			 				if (operation !== 'read' && options.models) {
+			 					return { 
+			 						     "models":kendo.stringify(options.models),
+			 					         "operation": operation 
+			 					       };
+			 				}
+			 			}
+			 		},
+			 		batch: true,
+			 		serverPaging: true,
+			 		pageSize: 10,
+			 		serverFiltering: true,
+			 		schema: {
+			 			model: {
+			 				id: "id",
+			 				fields: {
+			 					name:  { type:"string", editable: true, validation:{required: true} },
+			 					email: { type:"string", editable: true, validation:{email: true} },
+			 				}
+			 			},
+			 			data:function(res){return res.data},
+			 			total:function(res){return res.total}
+			 		},
+			 	});
+			$("#grid").kendoGrid({
+				dataSource: dataSource,
+			 	resizable: true,   //column可拉动 
+			 	pageable: true,    //分页
+			 	sortable: true,    //排序
+			 	height: 600,
+			 	filterable: true,
+			 	update:true,
+			 	toolbar: [{name:"create", text:"增加记录"}],
+			 	columns: [
+			 		{ 
+			 			field: "name", 
+			 			title: "作者", 
+			 			width: "100px",
+			 			headerAttributes: { style: "text-align: center" },
+			 			attributes: { style: "text-align: center" },
+			 		},
+			 		{ 
+			 			field: "email", 
+			 			title: "邮箱", 
+			 			width: "100px",
+			 			headerAttributes: { style: "text-align: center" },
+			 			attributes: { style: "text-align: center" }
+			 		},
+			 		{ 
+			 			command: [{name:"edit", text:"编辑"}, {name:"destroy", text:"删除"}], 
+			 			title: "操作", 
+			 			width: "172px",
+			 			headerAttributes: { style: "text-align: center" },
+			 			attributes: { style: "text-align: center" } 
+			 		},
+			 	],
+			 	editable:{
+			 		mode: "inline",
+			 		confirmation: "您想删除此条记录吗?",
+			 	},
+			 }).data("kendoGrid");
+			 
+			
+		});
+
+	</script>
+</div>
+{% endblock %}

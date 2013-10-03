@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %} 出版社管理 {% endblock %}
+
+{% block grid_content %}
+<div id="grid_publisher" class="k-content">
+	<div id="grid"></div>
+	<script>
+		$(document).ready(function(){
+			 var crudServiceBaseUrl = "/",
+			 	dataSource = new kendo.data.DataSource({
+			 		transport: {
+			 			read: {
+			 				url: crudServiceBaseUrl + "read_publisher/",
+			 				dataType: "json",
+			 				type: "GET"
+			 			},
+			 			update: {
+			 				url: crudServiceBaseUrl + "update_publisher/",
+			 				dataType: "json",
+			 				type: "POST" 
+			 			},
+			 			destroy: {
+			 				url: crudServiceBaseUrl + "delete_publisher/",
+			 				dataType: "json",
+			 				type: "POST" 
+			 			},
+			 			create: {
+			 				url: crudServiceBaseUrl + "create_publisher/",
+			 				dataType: "json",
+			 				type: "POST"
+			 			},
+			 			parameterMap: function(options, operation) {
+			 				if (operation == "read") {
+			 					return {
+			 						'page': options.page,
+			 						'pageSize': options.pageSize
+			 					}
+			 				}
+			 				if (operation !== 'read' && options.models) {
+			 					return { 
+			 						     "models":kendo.stringify(options.models),
+			 					         "operation": operation 
+			 					       };
+			 				}
+			 			}
+			 		},
+			 		batch: true,
+			 		serverPaging: true,
+			 		pageSize: 10,
+			 		serverFiltering: true,
+			 		schema: {
+			 			model: {
+			 				id: "id",
+			 				fields: {			 		
+			 					name:     { type:"string", editable: true, validation:{required: true} },
+			 					address:  { type:"string", editable: true, validation:{required: true} },
+			 					city:     { type:"string", editable: true, validation:{required: true} },
+			 					province: { type:"string", editable: true, validation:{required: true} },
+			 					country:  { type:"string", editable: true, validation:{required: true} },
+			 					website:  { type:"string", editable: true, validation:{required: true} },
+			 				}
+			 			},
+			 			data:function(res){return res.data},
+			 			total:function(res){return res.total}
+			 		},
+			 	});
+			 $("#grid").kendoGrid({
+			 	dataSource: dataSource,
+			 	resizable: true,   //column可拉动 
+			 	pageable: true,    //分页
+			 	sortable: true,    //排序
+			 	height: 600,
+			 	toolbar: [{name:"create", text:"增加记录"}],
+			 	columns: [ 
+			 		{ 
+			 			field: "name", 
+			 			title: "出版社", 
+			 			width: "100px",
+			 			headerAttributes: { style: "text-align: center" },
+			 			attributes: { style: "text-align: center" } 
+			 		},
+			 		{ 
+			 			field: "address", 
+			 			title: "地址", 
+			 			width: "100px",
+			 			headerAttributes: { style: "text-align: center" },
+			 			attributes: { style: "text-align: center" }
+			 		},
+			 		{ 
+			 			field: "city", 
+			 			title: "城市", 
+			 			width: "100px",
+			 			headerAttributes: { style: "text-align: center" },
+			 			attributes: { style: "text-align: center" }
+			 		},
+			 		{ 
+			 			field: "province", 
+			 			title: "省份", 
+			 			width: "100px",
+			 			headerAttributes: { style: "text-align: center" },
+			 			attributes: { style: "text-align: center" }
+			 		},
+			 		{ 
+			 			field: "country", 
+			 			title: "国家", 
+			 			width: "100px",
+			 			headerAttributes: { style: "text-align: center" },
+			 			attributes: { style: "text-align: center" }
+			 		},
+			 		{ 
+			 			field: "website", 
+			 			title: "网站", 
+			 			width: "100px",
+			 			headerAttributes: { style: "text-align: center" },
+			 			attributes: { style: "text-align: center" }
+			 		},
+			 		{ 
+			 			command: [{name:"edit", text:"编辑"}, {name:"destroy", text:"删除"}], 
+			 			title: "操作", 
+			 			width: "172px",
+			 			headerAttributes: { style: "text-align: center" },
+			 			attributes: { style: "text-align: center" } 
+			 		},
+			 	],
+			 	editable:{
+			 		mode: "inline",
+			 		confirmation: "您想删除此条记录吗?",
+			 	},
+			 });
+		});
+	</script>
+</div>
+{% endblock %}

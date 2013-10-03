@@ -1,0 +1,41 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>{% block title %}{% endblock %}</title>
+	<link href="/static/bootstrap/css/bootstrap.css" rel="stylesheet" type='text/css' />
+	<link href="/static/kendo/styles/kendo.common.min.css" rel="stylesheet">
+	<link href="/static/kendo/styles/kendo.default.min.css" rel="stylesheet">
+	<script type="text/javascript" src="/static/js/jquery-1.10.2.js"></script>
+	<script type="text/javascript" src="/static/bootstrap/js/bootstrap.js"></script>
+	<script type="text/javascript" src="/static/kendo/js/kendo.web.min.js"></script>
+</head>
+<body>
+	<div class="navbar navbar-static-top navbar-inverse">
+		<div class="navbar-inner">
+			<ul class="nav">
+				<li class="active">
+					<a href="/index/">首页</a>
+				</li>
+				<li class="divider-vertical"></li>
+				<li class="">
+					<a href="/book/">图书管理</a>
+				</li>
+				<li class="divider-vertical"></li>
+				<li class="">
+					<a href="/author/">作者管理</a>
+				</li>
+				<li class="divider-vertical"></li>
+				<li class="">
+					<a href="/publisher/">出版社管理</a>
+				</li>
+				<li class="divider-vertical"></li>									
+			</ul>
+		</div>
+	</div>
+	<!--kendo表格-->
+	{% block grid_content %}
+	
+	{% endblock %}
+	
+</body>
+</html>
